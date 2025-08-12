@@ -93,7 +93,7 @@
       <AssemblyReference>NPOI.Core</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="CleanupFolder" sap:VirtualizedContainerService.HintSize="1291,2991" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence DisplayName="CleanupFolder" sap:VirtualizedContainerService.HintSize="1596,2991" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -154,7 +154,7 @@
                           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
                         </scg:Dictionary>
                       </sap:WorkflowViewStateService.ViewState>
-                      <ui:LogMessage DisplayName="Log Message (Error File)" sap:VirtualizedContainerService.HintSize="492,166" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Error" Message="[&quot;Could not delete folder &quot; + CurrentFolder.FullName + &quot; due to exception: &quot; + exception.Message]" />
+                      <ui:LogMessage DisplayName="Log Message (Error Folder)" sap:VirtualizedContainerService.HintSize="492,166" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Error" Message="[&quot;Could not delete folder &quot; + CurrentFolder.FullName + &quot; due to exception: &quot; + exception.Message]" />
                     </Sequence>
                   </ActivityAction>
                 </Catch>
