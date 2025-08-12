@@ -1,40 +1,20 @@
-using Newtonsoft.Json;
-using PathFindrRoboticEnterpriseFramework.ObjectRepository;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Threading;
 using UiPath.CodedWorkflows;
 using UiPath.Core;
 using UiPath.Core.Activities;
-using UiPath.Core.Activities.Storage;
-using UiPath.Excel;
-using UiPath.Excel.Activities;
-using UiPath.Excel.Activities.API;
-using UiPath.Excel.Activities.API.Models;
-using UiPath.Orchestrator.Client.Models;
 using UiPath.Robot.Activities.Api;
-using UiPath.Testing;
-using UiPath.Testing.Activities.Api.Models;
-using UiPath.Testing.Activities.Models;
-using UiPath.Testing.Activities.TestData;
-using UiPath.Testing.Activities.TestDataQueues.Enums;
-using UiPath.Testing.Enums;
-using UiPath.UIAutomationNext.API.Contracts;
-using UiPath.UIAutomationNext.API.Models;
-using UiPath.UIAutomationNext.Enums;
+using Newtonsoft.Json;
 using LogLevel = UiPath.CodedWorkflows.LogLevel;
 
 namespace PathFindrRoboticEnterpriseFramework
 {
     public class SetTransactionStatus : CodedWorkflow
     {
+        
         [Workflow]
         public (int io_RetryNumber,int io_TransactionNumber,int io_ConsecutiveSystemExceptions) Execute(
                                 BusinessRuleException in_BusinessException,
-                                string in_TransactionField1, 
-                                string in_TransactionField2,
-                                string in_TransactionID,
                                 Exception in_SystemException,
                                 Dictionary<string,Object> in_Config,
                                 Dictionary<string,Object> in_OutputData,
@@ -47,6 +27,7 @@ namespace PathFindrRoboticEnterpriseFramework
                 Changed Set Transaction Status into a coded workflow to allow for scalable QueueItem Output Data and Analytics Data.
                 The functionality / steps are still the same between this coded workflow and the out of the box sequence in the RE-Framework
             */
+            
 
             Dictionary<string,object> analyticsData = GetAnalyticsData();
             SerializeOutputData(in_OutputData ??= new());
@@ -56,14 +37,12 @@ namespace PathFindrRoboticEnterpriseFramework
             {
                 //Sucessful Transaction   
                 HandleSuccess(in_TransactionItem,in_Config,in_OutputData,analyticsData);
-                LogSuccess(in_Config["LogMessage_Success"].ToString(),io_TransactionNumber,in_TransactionID,in_TransactionField1,in_TransactionField2);
                 IncrementTransaction(ref io_TransactionNumber,ref io_ConsecutiveSystemExceptions, ref io_RetryNumber);
             }
             else if(in_BusinessException != null)
             {
                 //Business Exception
                 HandleBusinessException(in_TransactionItem,in_BusinessException,in_Config,in_OutputData,analyticsData);
-                LogException(in_Config["LogMessage_BusinessRuleException"].ToString(),"BusinessException" ,io_TransactionNumber,in_TransactionID,in_TransactionField1,in_TransactionField2);
                 IncrementTransaction(ref io_TransactionNumber,ref io_ConsecutiveSystemExceptions, ref io_RetryNumber);
             }
             else
@@ -73,7 +52,7 @@ namespace PathFindrRoboticEnterpriseFramework
                 var screenShotPath = TakeScreenshot(in_Config["ExScreenshotsFolderPath"].ToString());
                 var queueRetry = HandleSystemException(in_TransactionItem,in_SystemException,in_Config,screenShotPath,ref io_RetryNumber,in_OutputData,analyticsData);
                 io_ConsecutiveSystemExceptions++;
-                HandleRetryTransaction(in_Config,ref io_RetryNumber,ref io_TransactionNumber,in_SystemException,queueRetry,in_TransactionID,in_TransactionField1,in_TransactionField2);
+                HandleRetryTransaction(in_Config,ref io_RetryNumber,ref io_TransactionNumber,in_SystemException,queueRetry);
                 CloseKillApplications();
             }
             return (io_RetryNumber,io_TransactionNumber,io_ConsecutiveSystemExceptions);
@@ -120,7 +99,7 @@ namespace PathFindrRoboticEnterpriseFramework
         /// <summary>
         /// Runs RetryCurrentTransaction workflow. Only used in System Exceptions.
         /// </summary>
-        private void HandleRetryTransaction(Dictionary<string,object> config, ref int retryNumber,ref int transactionNumber,Exception systemException,bool queueRetry,string transactionID,string transactionField1, string transactionField2)
+        private void HandleRetryTransaction(Dictionary<string,object> config, ref int retryNumber,ref int transactionNumber,Exception systemException,bool queueRetry)
         {
             var result = RunWorkflow("Framework\\RetryCurrentTransaction.xaml", new Dictionary<string, object>
             {
@@ -128,10 +107,7 @@ namespace PathFindrRoboticEnterpriseFramework
                 {"io_RetryNumber",retryNumber},
                 {"io_TransactionNumber",transactionNumber},
                 {"in_SystemException",systemException},
-                {"in_QueueRetry",queueRetry},
-                {"in_TransactionID",transactionID},
-                {"in_TransactionField1",transactionField1},
-                {"in_TransactionField2",transactionField2}
+                {"in_QueueRetry",queueRetry}
             });
             retryNumber = (int) result["io_RetryNumber"];
             transactionNumber = (int) result["io_TransactionNumber"];
@@ -152,6 +128,8 @@ namespace PathFindrRoboticEnterpriseFramework
                         config["OrchestratorQueueFolder"].ToString(),
                         analyticData, outputData, "", ErrorType.Application, "", 30000);
             },1000,retryCount);
+            
+            LogSuccess(config["LogMessage_Success"].ToString());
         }
         
         
@@ -171,6 +149,8 @@ namespace PathFindrRoboticEnterpriseFramework
                         config["OrchestratorQueueFolder"].ToString(),
                         analyticData, outputData, "", ErrorType.Business, ex.Message, 30000);
             },1000,retryCount);
+            
+            LogBusinessException(config["LogMessage_BusinessRuleException"].ToString());
         }
         
         
@@ -185,7 +165,6 @@ namespace PathFindrRoboticEnterpriseFramework
             
             Retry(() => 
             {
-                
                 if (queueRetry)
                     system.SetTransactionStatus(item,
                         ProcessingStatus.Failed,
@@ -261,31 +240,23 @@ namespace PathFindrRoboticEnterpriseFramework
         /// <summary>
         /// Logs a successful transaction event.
         /// </summary>
-        private void LogSuccess(string message, int transactionNumber, string transactionID, string field1, string field2)
+        private void LogSuccess(string message)
         {
             Log(message, LogLevel.Info, new Dictionary<string, object>
             {
-                { "logF_TransactionStatus", "Success" },
-                { "logF_TransactionNumber", transactionNumber.ToString() },
-                { "logF_TransactionID", transactionID },
-                { "logF_TransactionField1", field1 },
-                { "logF_TransactionField2", field2 },
+                { "logF_TransactionStatus", "Success" }
             });
         }
         
         
         /// <summary>
-        /// Logs a business or system exception event.
+        /// Logs a business exception event.
         /// </summary>
-        private void LogException(string message, string exceptionType, int transactionNumber, string transactionID, string field1, string field2)
+        private void LogBusinessException(string message)
         {
             Log(message, LogLevel.Error, new Dictionary<string, object>
             {
-                { "logF_TransactionStatus", exceptionType },
-                { "logF_TransactionNumber", transactionNumber.ToString() },
-                { "logF_TransactionID", transactionID },
-                { "logF_TransactionField1", field1 },
-                { "logF_TransactionField2", field2 },
+                { "logF_TransactionStatus", "BusinessException" }
             });
         }
         
@@ -336,7 +307,7 @@ namespace PathFindrRoboticEnterpriseFramework
                         outputData[key] = JsonConvert.SerializeObject(outputData[key],Formatting.Indented);
                 }catch(Exception e)
                 {
-                    Log("Cannot Add " + key +" to Output Data as it cannot be serialized",LogLevel.Error);
+                    Log("Cannot Add " + key +" to Output Data as it cannot be serialized: " + e.Message,LogLevel.Error);
                     keysToRemove.Add(key);
                 }
             }

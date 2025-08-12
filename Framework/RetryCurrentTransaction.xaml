@@ -5,9 +5,6 @@
     <x:Property sap2010:Annotation.AnnotationText="Sequential counter of transaction items." Name="io_TransactionNumber" Type="InOutArgument(x:Int32)" />
     <x:Property sap2010:Annotation.AnnotationText="Used during transitions between states to represent exceptions other than business exceptions." Name="in_SystemException" Type="InArgument(s:Exception)" />
     <x:Property sap2010:Annotation.AnnotationText="Used to indicate whether the retry procedure is managed by an Orchestrator queue." Name="in_QueueRetry" Type="InArgument(x:Boolean)" />
-    <x:Property Name="in_TransactionID" Type="InArgument(x:String)" />
-    <x:Property Name="in_TransactionField1" Type="InArgument(x:String)" />
-    <x:Property Name="in_TransactionField2" Type="InArgument(x:String)" />
   </x:Members>
   <sap:VirtualizedContainerService.HintSize>884.666666666667,809.333333333333</sap:VirtualizedContainerService.HintSize>
   <sap2010:WorkflowViewState.IdRef>ActivityBuilder_1</sap2010:WorkflowViewState.IdRef>
@@ -51,7 +48,7 @@
       <AssemblyReference>System.Reflection.Metadata</AssemblyReference>
     </sco1:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Flowchart sap2010:Annotation.AnnotationText="Manage the retrying mechanism for the framework and it is invoked in SetTransactionStatus.xaml when a system exception occurs. &#xA;The retrying method is based on the configurations defined in Config.xlsx." DisplayName="Retry Current Transaction" sap:VirtualizedContainerService.HintSize="1488,519.024" sap2010:WorkflowViewState.IdRef="Flowchart_7">
+  <Flowchart sap2010:Annotation.AnnotationText="Manage the retrying mechanism for the framework and it is invoked in SetTransactionStatus.xaml when a system exception occurs. &#xA;The retrying method is based on the configurations defined in Config.xlsx." DisplayName="Retry Current Transaction" sap:VirtualizedContainerService.HintSize="1623,831" sap2010:WorkflowViewState.IdRef="Flowchart_7">
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -151,14 +148,10 @@
                               <av:Size x:Key="ShapeSize">110,70</av:Size>
                             </scg:Dictionary>
                           </sap:WorkflowViewStateService.ViewState>
-                          <ui:RemoveLogFields DisplayName="Remove transaction log fields (System Exception)" sap:VirtualizedContainerService.HintSize="110,70" sap2010:WorkflowViewState.IdRef="RemoveLogFields_1">
+                          <ui:RemoveLogFields DisplayName="Remove transaction log fields (System Exception)" sap:VirtualizedContainerService.HintSize="338,91" sap2010:WorkflowViewState.IdRef="RemoveLogFields_1">
                             <ui:RemoveLogFields.Fields>
-                              <scg:List x:TypeArguments="InArgument(x:String)" Capacity="8">
+                              <scg:List x:TypeArguments="InArgument(x:String)" Capacity="4">
                                 <InArgument x:TypeArguments="x:String">logF_TransactionStatus</InArgument>
-                                <InArgument x:TypeArguments="x:String">logF_TransactionNumber</InArgument>
-                                <InArgument x:TypeArguments="x:String">logF_TransactionID</InArgument>
-                                <InArgument x:TypeArguments="x:String">logF_TransactionField1</InArgument>
-                                <InArgument x:TypeArguments="x:String">logF_TransactionField2</InArgument>
                               </scg:List>
                             </ui:RemoveLogFields.Fields>
                           </ui:RemoveLogFields>
@@ -299,10 +292,6 @@
       <ui:AddLogFields DisplayName="Add transaction log fields (System Exception)" sap:VirtualizedContainerService.HintSize="110,70" sap2010:WorkflowViewState.IdRef="AddLogFields_1">
         <ui:AddLogFields.Fields>
           <InArgument x:TypeArguments="x:String" x:Key="logF_TransactionStatus">ApplicationException</InArgument>
-          <InArgument x:TypeArguments="x:String" x:Key="logF_TransactionNumber">[io_TransactionNumber.ToString]</InArgument>
-          <InArgument x:TypeArguments="x:String" x:Key="logF_TransactionID">[in_TransactionID]</InArgument>
-          <InArgument x:TypeArguments="x:String" x:Key="logF_TransactionField1">[in_TransactionField1]</InArgument>
-          <InArgument x:TypeArguments="x:String" x:Key="logF_TransactionField2">[in_TransactionField2]</InArgument>
         </ui:AddLogFields.Fields>
       </ui:AddLogFields>
       <FlowStep.Next>

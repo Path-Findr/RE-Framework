@@ -18,30 +18,6 @@
       "DataSourceItems": null
     },
     {
-      "Name": "in_TransactionField1",
-      "DisplayName": "in_TransactionField1",
-      "Category": null,
-      "Tooltip": null,
-      "Placeholder": null,
-      "Widget": null,
-      "IsRequired": true,
-      "IsPrincipal": true,
-      "ArgumentType": 0,
-      "DataSourceItems": null
-    },
-    {
-      "Name": "in_TransactionField2",
-      "DisplayName": "in_TransactionField2",
-      "Category": null,
-      "Tooltip": null,
-      "Placeholder": null,
-      "Widget": null,
-      "IsRequired": true,
-      "IsPrincipal": true,
-      "ArgumentType": 0,
-      "DataSourceItems": null
-    },
-    {
       "Name": "in_SystemException",
       "DisplayName": "in_SystemException",
       "Category": null,
@@ -104,18 +80,6 @@
     {
       "Name": "io_ConsecutiveSystemExceptions",
       "DisplayName": "io_ConsecutiveSystemExceptions",
-      "Category": null,
-      "Tooltip": null,
-      "Placeholder": null,
-      "Widget": null,
-      "IsRequired": true,
-      "IsPrincipal": true,
-      "ArgumentType": 0,
-      "DataSourceItems": null
-    },
-    {
-      "Name": "in_TransactionID",
-      "DisplayName": "in_TransactionID",
       "Category": null,
       "Tooltip": null,
       "Placeholder": null,
